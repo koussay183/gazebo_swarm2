@@ -1,0 +1,444 @@
+<?xml version="1.0" ?>
+<!--
+  Quadrotor réaliste style DJI F450 / 3DR Iris
+  =============================================
+  Wheelbase  : 450 mm (moteur à moteur en diagonale)
+  Empattement: 318 mm (côté à côté)
+  Hélices    : 10 pouces (~254 mm de diamètre)
+  Masse totale: 1.0 kg (vol avec batterie)
+  Configuration: X-frame (bras à ±45° de l'axe avant)
+
+  Architecture :
+    base_link  — corps principal (toute la géométrie visuelle)
+    rotor_0..3 — hélices (joints continus pour animation)
+
+  Plugins :
+    VelocityControl  — contrôle cinématique via cmd_vel
+    PosePublisher    — publie la pose @ 50 Hz
+-->
+<sdf version="1.9">
+<model name="drone">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CORPS PRINCIPAL (base_link)
+       Toute la géométrie rigide : frame, moteurs, électronique,
+       batterie, train d'atterrissage.
+       gravity=false → le drone flotte sans propulsion physique.
+       ═══════════════════════════════════════════════════════════ -->
+  <link name="base_link">
+    <gravity>false</gravity>
+
+    <inertial>
+      <mass>1.0</mass>
+      <inertia>
+        <ixx>0.0082</ixx>
+        <iyy>0.0082</iyy>
+        <izz>0.0149</izz>
+        <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+      </inertia>
+    </inertial>
+
+    <!-- ── COLLISION (boîte englobante) ───────────────────────── -->
+    <collision name="collision">
+      <geometry><box><size>0.55 0.55 0.18</size></box></geometry>
+    </collision>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PLAQUES CENTRALES (frame en fibre de carbone)
+         Deux plaques : top et bottom, avec colonne centrale.
+         ══════════════════════════════════════════════════════════ -->
+
+    <!-- Plaque supérieure (top plate) -->
+    <visual name="top_plate">
+      <pose>0 0 0.025 0 0 0.7854</pose>
+      <geometry><cylinder><radius>0.085</radius><length>0.008</length></cylinder></geometry>
+      <material>
+        <ambient>0.08 0.08 0.08 1</ambient>
+        <diffuse>0.12 0.12 0.12 1</diffuse>
+        <specular>0.6 0.6 0.6 1</specular>
+      </material>
+    </visual>
+
+    <!-- Plaque inférieure (bottom plate) -->
+    <visual name="bottom_plate">
+      <pose>0 0 -0.015 0 0 0.7854</pose>
+      <geometry><cylinder><radius>0.085</radius><length>0.006</length></cylinder></geometry>
+      <material>
+        <ambient>0.08 0.08 0.08 1</ambient>
+        <diffuse>0.12 0.12 0.12 1</diffuse>
+        <specular>0.6 0.6 0.6 1</specular>
+      </material>
+    </visual>
+
+    <!-- Colonne centrale (standoffs) -->
+    <visual name="center_column">
+      <pose>0 0 0.005 0 0 0</pose>
+      <geometry><cylinder><radius>0.022</radius><length>0.045</length></cylinder></geometry>
+      <material>
+        <ambient>0.15 0.15 0.15 1</ambient>
+        <diffuse>0.2 0.2 0.2 1</diffuse>
+        <specular>0.4 0.4 0.4 1</specular>
+      </material>
+    </visual>
+
+    <!-- ══════════════════════════════════════════════════════════
+         BRAS (X-frame carbon fiber)
+         4 bras à ±45° — configuration X
+         Avant-droit (0°+45°), Avant-gauche (0°-45°),
+         Arrière-droit (180°+45°), Arrière-gauche (180°-45°)
+         Longueur bras depuis centre : 155 mm
+         ══════════════════════════════════════════════════════════ -->
+
+    <!-- Bras Avant-Droit (AD) — +45° -->
+    <visual name="arm_FR">
+      <pose>0.095 -0.095 0.002 0 0 -0.7854</pose>
+      <geometry><cylinder><radius>0.013</radius><length>0.28</length></cylinder></geometry>
+      <material>
+        <ambient>0.7 0.25 0.0 1</ambient>
+        <diffuse>0.85 0.35 0.0 1</diffuse>
+        <specular>0.3 0.15 0.0 1</specular>
+      </material>
+    </visual>
+
+    <!-- Bras Avant-Gauche (AG) — -45° -->
+    <visual name="arm_FL">
+      <pose>0.095 0.095 0.002 0 0 0.7854</pose>
+      <geometry><cylinder><radius>0.013</radius><length>0.28</length></cylinder></geometry>
+      <material>
+        <ambient>0.7 0.25 0.0 1</ambient>
+        <diffuse>0.85 0.35 0.0 1</diffuse>
+        <specular>0.3 0.15 0.0 1</specular>
+      </material>
+    </visual>
+
+    <!-- Bras Arrière-Droit (ArD) — +135° -->
+    <visual name="arm_RR">
+      <pose>-0.095 -0.095 0.002 0 0 0.7854</pose>
+      <geometry><cylinder><radius>0.013</radius><length>0.28</length></cylinder></geometry>
+      <material>
+        <ambient>0.08 0.08 0.08 1</ambient>
+        <diffuse>0.14 0.14 0.14 1</diffuse>
+        <specular>0.3 0.3 0.3 1</specular>
+      </material>
+    </visual>
+
+    <!-- Bras Arrière-Gauche (ArG) — -135° -->
+    <visual name="arm_RL">
+      <pose>-0.095 0.095 0.002 0 0 -0.7854</pose>
+      <geometry><cylinder><radius>0.013</radius><length>0.28</length></cylinder></geometry>
+      <material>
+        <ambient>0.08 0.08 0.08 1</ambient>
+        <diffuse>0.14 0.14 0.14 1</diffuse>
+        <specular>0.3 0.3 0.3 1</specular>
+      </material>
+    </visual>
+
+    <!-- ══════════════════════════════════════════════════════════
+         MOTEURS BRUSHLESS (4×)
+         Emplacements : (±0.159, ±0.159) — wheelbase 450 mm diagonal
+         Style 2212/2312 — stator cylindrique + cloche moteur
+         ══════════════════════════════════════════════════════════ -->
+
+    <!-- MOTEUR Avant-Droit (CCW — rouge) -->
+    <visual name="motor_FR_stator">
+      <pose>0.159 -0.159 -0.005 0 0 0</pose>
+      <geometry><cylinder><radius>0.018</radius><length>0.022</length></cylinder></geometry>
+      <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.65 0.65 0.65 1</diffuse><specular>0.9 0.9 0.9 1</specular></material>
+    </visual>
+    <visual name="motor_FR_bell">
+      <pose>0.159 -0.159 0.013 0 0 0</pose>
+      <geometry><cylinder><radius>0.016</radius><length>0.018</length></cylinder></geometry>
+      <material><ambient>0.7 0.1 0.1 1</ambient><diffuse>0.85 0.15 0.15 1</diffuse><specular>0.5 0.1 0.1 1</specular></material>
+    </visual>
+    <visual name="motor_FR_shaft">
+      <pose>0.159 -0.159 0.027 0 0 0</pose>
+      <geometry><cylinder><radius>0.003</radius><length>0.012</length></cylinder></geometry>
+      <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+    </visual>
+
+    <!-- MOTEUR Avant-Gauche (CW — rouge) -->
+    <visual name="motor_FL_stator">
+      <pose>0.159 0.159 -0.005 0 0 0</pose>
+      <geometry><cylinder><radius>0.018</radius><length>0.022</length></cylinder></geometry>
+      <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.65 0.65 0.65 1</diffuse><specular>0.9 0.9 0.9 1</specular></material>
+    </visual>
+    <visual name="motor_FL_bell">
+      <pose>0.159 0.159 0.013 0 0 0</pose>
+      <geometry><cylinder><radius>0.016</radius><length>0.018</length></cylinder></geometry>
+      <material><ambient>0.7 0.1 0.1 1</ambient><diffuse>0.85 0.15 0.15 1</diffuse><specular>0.5 0.1 0.1 1</specular></material>
+    </visual>
+    <visual name="motor_FL_shaft">
+      <pose>0.159 0.159 0.027 0 0 0</pose>
+      <geometry><cylinder><radius>0.003</radius><length>0.012</length></cylinder></geometry>
+      <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+    </visual>
+
+    <!-- MOTEUR Arrière-Droit (CW — noir) -->
+    <visual name="motor_RR_stator">
+      <pose>-0.159 -0.159 -0.005 0 0 0</pose>
+      <geometry><cylinder><radius>0.018</radius><length>0.022</length></cylinder></geometry>
+      <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.65 0.65 0.65 1</diffuse><specular>0.9 0.9 0.9 1</specular></material>
+    </visual>
+    <visual name="motor_RR_bell">
+      <pose>-0.159 -0.159 0.013 0 0 0</pose>
+      <geometry><cylinder><radius>0.016</radius><length>0.018</length></cylinder></geometry>
+      <material><ambient>0.08 0.08 0.08 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+    </visual>
+    <visual name="motor_RR_shaft">
+      <pose>-0.159 -0.159 0.027 0 0 0</pose>
+      <geometry><cylinder><radius>0.003</radius><length>0.012</length></cylinder></geometry>
+      <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+    </visual>
+
+    <!-- MOTEUR Arrière-Gauche (CCW — noir) -->
+    <visual name="motor_RL_stator">
+      <pose>-0.159 0.159 -0.005 0 0 0</pose>
+      <geometry><cylinder><radius>0.018</radius><length>0.022</length></cylinder></geometry>
+      <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.65 0.65 0.65 1</diffuse><specular>0.9 0.9 0.9 1</specular></material>
+    </visual>
+    <visual name="motor_RL_bell">
+      <pose>-0.159 0.159 0.013 0 0 0</pose>
+      <geometry><cylinder><radius>0.016</radius><length>0.018</length></cylinder></geometry>
+      <material><ambient>0.08 0.08 0.08 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+    </visual>
+    <visual name="motor_RL_shaft">
+      <pose>-0.159 0.159 0.027 0 0 0</pose>
+      <geometry><cylinder><radius>0.003</radius><length>0.012</length></cylinder></geometry>
+      <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+    </visual>
+
+    <!-- ══════════════════════════════════════════════════════════
+         HÉLICES (4×) — disques plats bi-pales
+         Diamètre : 254 mm (10 pouces)
+         CCW : avant-droit + arrière-gauche (rouge foncé)
+         CW  : avant-gauche + arrière-droit  (gris foncé)
+         ══════════════════════════════════════════════════════════ -->
+
+    <!-- Pale 1 hélice FR (CCW) -->
+    <visual name="prop_FR_blade1">
+      <pose>0.159 -0.159 0.036 0 0 0</pose>
+      <geometry><box><size>0.240 0.022 0.004</size></box></geometry>
+      <material><ambient>0.5 0.08 0.08 1</ambient><diffuse>0.65 0.1 0.1 1</diffuse><specular>0.2 0.05 0.05 1</specular></material>
+    </visual>
+    <visual name="prop_FR_blade2">
+      <pose>0.159 -0.159 0.036 0 0 1.5708</pose>
+      <geometry><box><size>0.240 0.022 0.004</size></box></geometry>
+      <material><ambient>0.5 0.08 0.08 1</ambient><diffuse>0.65 0.1 0.1 1</diffuse><specular>0.2 0.05 0.05 1</specular></material>
+    </visual>
+    <visual name="prop_FR_hub">
+      <pose>0.159 -0.159 0.036 0 0 0</pose>
+      <geometry><cylinder><radius>0.018</radius><length>0.005</length></cylinder></geometry>
+      <material><ambient>0.2 0.05 0.05 1</ambient><diffuse>0.3 0.08 0.08 1</diffuse></material>
+    </visual>
+
+    <!-- Pale 1 hélice FL (CW) -->
+    <visual name="prop_FL_blade1">
+      <pose>0.159 0.159 0.036 0 0 0.7854</pose>
+      <geometry><box><size>0.240 0.022 0.004</size></box></geometry>
+      <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.25 0.25 0.25 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+    </visual>
+    <visual name="prop_FL_blade2">
+      <pose>0.159 0.159 0.036 0 0 2.3562</pose>
+      <geometry><box><size>0.240 0.022 0.004</size></box></geometry>
+      <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.25 0.25 0.25 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+    </visual>
+    <visual name="prop_FL_hub">
+      <pose>0.159 0.159 0.036 0 0 0</pose>
+      <geometry><cylinder><radius>0.018</radius><length>0.005</length></cylinder></geometry>
+      <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.18 0.18 0.18 1</diffuse></material>
+    </visual>
+
+    <!-- Pale 1 hélice RR (CW) -->
+    <visual name="prop_RR_blade1">
+      <pose>-0.159 -0.159 0.036 0 0 0.7854</pose>
+      <geometry><box><size>0.240 0.022 0.004</size></box></geometry>
+      <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.25 0.25 0.25 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+    </visual>
+    <visual name="prop_RR_blade2">
+      <pose>-0.159 -0.159 0.036 0 0 2.3562</pose>
+      <geometry><box><size>0.240 0.022 0.004</size></box></geometry>
+      <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.25 0.25 0.25 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+    </visual>
+    <visual name="prop_RR_hub">
+      <pose>-0.159 -0.159 0.036 0 0 0</pose>
+      <geometry><cylinder><radius>0.018</radius><length>0.005</length></cylinder></geometry>
+      <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.18 0.18 0.18 1</diffuse></material>
+    </visual>
+
+    <!-- Pale 1 hélice RL (CCW) -->
+    <visual name="prop_RL_blade1">
+      <pose>-0.159 0.159 0.036 0 0 0</pose>
+      <geometry><box><size>0.240 0.022 0.004</size></box></geometry>
+      <material><ambient>0.5 0.08 0.08 1</ambient><diffuse>0.65 0.1 0.1 1</diffuse><specular>0.2 0.05 0.05 1</specular></material>
+    </visual>
+    <visual name="prop_RL_blade2">
+      <pose>-0.159 0.159 0.036 0 0 1.5708</pose>
+      <geometry><box><size>0.240 0.022 0.004</size></box></geometry>
+      <material><ambient>0.5 0.08 0.08 1</ambient><diffuse>0.65 0.1 0.1 1</diffuse><specular>0.2 0.05 0.05 1</specular></material>
+    </visual>
+    <visual name="prop_RL_hub">
+      <pose>-0.159 0.159 0.036 0 0 0</pose>
+      <geometry><cylinder><radius>0.018</radius><length>0.005</length></cylinder></geometry>
+      <material><ambient>0.2 0.05 0.05 1</ambient><diffuse>0.3 0.08 0.08 1</diffuse></material>
+    </visual>
+
+    <!-- ══════════════════════════════════════════════════════════
+         ÉLECTRONIQUE EMBARQUÉE
+         Flight controller, GPS, ESC stack
+         ══════════════════════════════════════════════════════════ -->
+
+    <!-- Flight controller (Pixhawk style) -->
+    <visual name="fc_body">
+      <pose>0 0 0.032 0 0 0</pose>
+      <geometry><box><size>0.050 0.040 0.015</size></box></geometry>
+      <material><ambient>0.1 0.2 0.5 1</ambient><diffuse>0.15 0.3 0.7 1</diffuse><specular>0.3 0.4 0.8 1</specular></material>
+    </visual>
+
+    <!-- GPS mast + dome -->
+    <visual name="gps_mast">
+      <pose>-0.04 0 0.038 0 0 0</pose>
+      <geometry><cylinder><radius>0.005</radius><length>0.025</length></cylinder></geometry>
+      <material><ambient>0.4 0.4 0.4 1</ambient><diffuse>0.5 0.5 0.5 1</diffuse></material>
+    </visual>
+    <visual name="gps_dome">
+      <pose>-0.04 0 0.056 0 0 0</pose>
+      <geometry><sphere><radius>0.014</radius></sphere></geometry>
+      <material><ambient>0.85 0.85 0.85 1</ambient><diffuse>0.95 0.95 0.95 1</diffuse><specular>0.6 0.6 0.6 1</specular></material>
+    </visual>
+
+    <!-- Récepteur RC (petite boîte côté) -->
+    <visual name="rx_box">
+      <pose>0.03 0.04 0.016 0 0 0</pose>
+      <geometry><box><size>0.025 0.015 0.010</size></box></geometry>
+      <material><ambient>0.6 0.6 0.0 1</ambient><diffuse>0.75 0.75 0.0 1</diffuse></material>
+    </visual>
+
+    <!-- ESC stack (sous la plaque basse) -->
+    <visual name="esc_stack">
+      <pose>0 0 -0.022 0 0 0</pose>
+      <geometry><cylinder><radius>0.040</radius><length>0.012</length></cylinder></geometry>
+      <material><ambient>0.05 0.15 0.05 1</ambient><diffuse>0.08 0.22 0.08 1</diffuse><specular>0.2 0.5 0.2 1</specular></material>
+    </visual>
+
+    <!-- ══════════════════════════════════════════════════════════
+         BATTERIE LIPO
+         Montée en dessous de la plaque inférieure
+         Style 4S 5200mAh (format rectangulaire allongé)
+         ══════════════════════════════════════════════════════════ -->
+    <visual name="battery">
+      <pose>0 0 -0.048 0 0 0</pose>
+      <geometry><box><size>0.130 0.044 0.032</size></box></geometry>
+      <material><ambient>0.1 0.35 0.1 1</ambient><diffuse>0.15 0.50 0.15 1</diffuse><specular>0.1 0.3 0.1 1</specular></material>
+    </visual>
+    <!-- Connecteur batterie -->
+    <visual name="battery_connector">
+      <pose>0.068 0 -0.048 0 1.5708 0</pose>
+      <geometry><cylinder><radius>0.007</radius><length>0.012</length></cylinder></geometry>
+      <material><ambient>0.6 0.6 0.0 1</ambient><diffuse>0.8 0.8 0.0 1</diffuse></material>
+    </visual>
+    <!-- Étiquette batterie (bande jaune) -->
+    <visual name="battery_label">
+      <pose>0 0 -0.033 0 0 0</pose>
+      <geometry><box><size>0.128 0.042 0.003</size></box></geometry>
+      <material><ambient>0.8 0.7 0.0 1</ambient><diffuse>0.9 0.8 0.0 1</diffuse></material>
+    </visual>
+
+    <!-- ══════════════════════════════════════════════════════════
+         TRAIN D'ATTERRISSAGE
+         4 jambes en V + patins horizontaux
+         Hauteur utile : ~120 mm (pour hélices au-dessus du sol)
+         ══════════════════════════════════════════════════════════ -->
+
+    <!-- Jambe Avant-Droit -->
+    <visual name="leg_FR">
+      <pose>0.085 -0.085 -0.095 0 0.42 -0.7854</pose>
+      <geometry><cylinder><radius>0.007</radius><length>0.175</length></cylinder></geometry>
+      <material><ambient>0.12 0.12 0.12 1</ambient><diffuse>0.18 0.18 0.18 1</diffuse></material>
+    </visual>
+    <!-- Jambe Avant-Gauche -->
+    <visual name="leg_FL">
+      <pose>0.085 0.085 -0.095 0 0.42 0.7854</pose>
+      <geometry><cylinder><radius>0.007</radius><length>0.175</length></cylinder></geometry>
+      <material><ambient>0.12 0.12 0.12 1</ambient><diffuse>0.18 0.18 0.18 1</diffuse></material>
+    </visual>
+    <!-- Jambe Arrière-Droit -->
+    <visual name="leg_RR">
+      <pose>-0.085 -0.085 -0.095 0 0.42 0.7854</pose>
+      <geometry><cylinder><radius>0.007</radius><length>0.175</length></cylinder></geometry>
+      <material><ambient>0.12 0.12 0.12 1</ambient><diffuse>0.18 0.18 0.18 1</diffuse></material>
+    </visual>
+    <!-- Jambe Arrière-Gauche -->
+    <visual name="leg_RL">
+      <pose>-0.085 0.085 -0.095 0 0.42 -0.7854</pose>
+      <geometry><cylinder><radius>0.007</radius><length>0.175</length></cylinder></geometry>
+      <material><ambient>0.12 0.12 0.12 1</ambient><diffuse>0.18 0.18 0.18 1</diffuse></material>
+    </visual>
+
+    <!-- Patin avant (crossbar) -->
+    <visual name="skid_front">
+      <pose>0.095 0 -0.168 0 0 1.5708</pose>
+      <geometry><cylinder><radius>0.007</radius><length>0.200</length></cylinder></geometry>
+      <material><ambient>0.08 0.08 0.08 1</ambient><diffuse>0.12 0.12 0.12 1</diffuse></material>
+    </visual>
+    <!-- Patin arrière (crossbar) -->
+    <visual name="skid_rear">
+      <pose>-0.095 0 -0.168 0 0 1.5708</pose>
+      <geometry><cylinder><radius>0.007</radius><length>0.200</length></cylinder></geometry>
+      <material><ambient>0.08 0.08 0.08 1</ambient><diffuse>0.12 0.12 0.12 1</diffuse></material>
+    </visual>
+
+    <!-- Amortisseurs patins (4 petites sphères aux extrémités) -->
+    <visual name="skid_pad_FR"><pose>0.095 -0.098 -0.168 0 0 0</pose><geometry><sphere><radius>0.009</radius></sphere></geometry><material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.08 0.08 0.08 1</diffuse></material></visual>
+    <visual name="skid_pad_FL"><pose>0.095  0.098 -0.168 0 0 0</pose><geometry><sphere><radius>0.009</radius></sphere></geometry><material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.08 0.08 0.08 1</diffuse></material></visual>
+    <visual name="skid_pad_RR"><pose>-0.095 -0.098 -0.168 0 0 0</pose><geometry><sphere><radius>0.009</radius></sphere></geometry><material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.08 0.08 0.08 1</diffuse></material></visual>
+    <visual name="skid_pad_RL"><pose>-0.095  0.098 -0.168 0 0 0</pose><geometry><sphere><radius>0.009</radius></sphere></geometry><material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.08 0.08 0.08 1</diffuse></material></visual>
+
+    <!-- ══════════════════════════════════════════════════════════
+         VOYANTS LED
+         Avant : rouge  (nose indicator)
+         Arrière: vert  (tail indicator)
+         ══════════════════════════════════════════════════════════ -->
+    <visual name="led_front">
+      <pose>0.08 0 -0.012 0 0 0</pose>
+      <geometry><sphere><radius>0.006</radius></sphere></geometry>
+      <material>
+        <ambient>1.0 0.1 0.1 1</ambient>
+        <diffuse>1.0 0.2 0.2 1</diffuse>
+        <emissive>0.8 0.0 0.0 1</emissive>
+      </material>
+    </visual>
+    <visual name="led_rear">
+      <pose>-0.08 0 -0.012 0 0 0</pose>
+      <geometry><sphere><radius>0.006</radius></sphere></geometry>
+      <material>
+        <ambient>0.1 1.0 0.1 1</ambient>
+        <diffuse>0.2 1.0 0.2 1</diffuse>
+        <emissive>0.0 0.8 0.0 1</emissive>
+      </material>
+    </visual>
+
+  </link>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PLUGINS
+       ═══════════════════════════════════════════════════════════ -->
+
+  <!-- Contrôle de vitesse cinématique (cmd_vel → mouvement direct) -->
+  <plugin
+    filename="gz-sim-velocity-control-system"
+    name="gz::sim::systems::VelocityControl">
+    <topic>cmd_vel</topic>
+  </plugin>
+
+  <!-- Publication de la pose à 50 Hz (retour position vers Python) -->
+  <plugin
+    filename="gz-sim-pose-publisher-system"
+    name="gz::sim::systems::PosePublisher">
+    <publish_link_pose>false</publish_link_pose>
+    <publish_nested_model_pose>false</publish_nested_model_pose>
+    <publish_model_pose>true</publish_model_pose>
+    <update_frequency>50</update_frequency>
+  </plugin>
+
+</model>
+</sdf>

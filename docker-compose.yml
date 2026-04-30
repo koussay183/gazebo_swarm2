@@ -1,0 +1,17 @@
+services:
+  swarm:
+    build: .
+    image: gazebo_swarm:latest
+    container_name: swarm_sim
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=0
+    volumes:
+      - .:/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    network_mode: host
+    privileged: true
+    stdin_open: true
+    tty: true
+    command: /bin/bash
