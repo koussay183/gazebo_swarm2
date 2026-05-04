@@ -1,0 +1,52 @@
+# Optional sensor bridges for PX4 X500 variants
+# ============================================================
+# These bridges are commented out by default because they
+# depend on the exact PX4 model variant selected (x500 vs
+# x500_depth vs x500_lidar, etc.).
+#
+# Uncomment and adjust model names to match your simulation.
+#
+# NOTE: Sensor data bridged here is for MONITORING only.
+# The MAPPO policy uses VehicleLocalPosition from PX4, not
+# raw sensor data from Gazebo.
+#
+# Available PX4 SITL model variants:
+#   gz_x500          — basic X500 quadrotor
+#   gz_x500_depth    — X500 with depth camera (Intel D455)
+#   gz_x500_lidar    — X500 with 2D lidar
+# ============================================================
+
+# ---- Depth Camera (x500_depth variant) ---------------------
+# - ros_topic_name: /x500_0/depth_camera/image
+#   gz_topic_name: /world/default/model/x500_depth_0/link/camera_link/sensor/depth_camera/image
+#   ros_type_name: sensor_msgs/msg/Image
+#   gz_type_name: gz.msgs.Image
+#   direction: GZ_TO_ROS
+#
+# - ros_topic_name: /x500_0/depth_camera/depth_image
+#   gz_topic_name: /world/default/model/x500_depth_0/link/camera_link/sensor/depth_camera/depth_image
+#   ros_type_name: sensor_msgs/msg/Image
+#   gz_type_name: gz.msgs.Image
+#   direction: GZ_TO_ROS
+#
+# - ros_topic_name: /x500_0/depth_camera/points
+#   gz_topic_name: /world/default/model/x500_depth_0/link/camera_link/sensor/depth_camera/points
+#   ros_type_name: sensor_msgs/msg/PointCloud2
+#   gz_type_name: gz.msgs.PointCloudPacked
+#   direction: GZ_TO_ROS
+
+# ---- 2D Lidar (x500_lidar variant) -------------------------
+# - ros_topic_name: /x500_0/lidar
+#   gz_topic_name: /world/default/model/x500_lidar_0/link/lidar_link/sensor/lidar/scan
+#   ros_type_name: sensor_msgs/msg/LaserScan
+#   gz_type_name: gz.msgs.LaserScan
+#   direction: GZ_TO_ROS
+
+# ---- IMU (all variants) ------------------------------------
+# NOTE: PX4 already provides IMU data via VehicleOdometry.
+# Only bridge if you need raw Gazebo IMU for debugging.
+# - ros_topic_name: /x500_0/imu
+#   gz_topic_name: /world/default/model/x500_0/link/base_link/sensor/imu_sensor/imu
+#   ros_type_name: sensor_msgs/msg/Imu
+#   gz_type_name: gz.msgs.IMU
+#   direction: GZ_TO_ROS

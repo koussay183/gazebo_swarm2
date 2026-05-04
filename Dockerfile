@@ -58,7 +58,8 @@ RUN pip3 install --break-system-packages \
     torch \
     numpy \
     gymnasium \
-    mavsdk
+    mavsdk \
+    matplotlib
 
 # ── Symlink python3.12 (appelé explicitement dans run.sh) ─────────────────
 RUN ln -sf /usr/bin/python3 /usr/local/bin/python3.12

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>mappo_swarm_bridge</name>
+  <version>0.1.0</version>
+  <description>
+    Gazebo Harmonic to ROS 2 bridge configuration for MAPPO drone swarm.
+    Bridges model poses, clock, and optional sensor data from Gazebo to ROS 2
+    for visualisation and monitoring. NOT part of the PX4 control path.
+  </description>
+  <maintainer email="web@slamatravel.com">koussay183</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>ros_gz_bridge</depend>
+  <depend>ros_gz_interfaces</depend>
+  <depend>geometry_msgs</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
