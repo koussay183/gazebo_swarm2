@@ -1,0 +1,55 @@
+# PX4 topic naming styles
+# ============================================================
+# Style A: namespaced (multi-drone, uXRCE-DDS with PX4_UXRCE_DDS_NS)
+#   Each PX4 instance must be launched with:
+#     PX4_UXRCE_DDS_NS=px4_N ./px4 ...
+#   This sets the DDS namespace so topics appear as /px4_N/fmu/...
+# ============================================================
+style_namespaced:
+  drone_0:
+    offboard_control_mode: /px4_0/fmu/in/offboard_control_mode
+    trajectory_setpoint: /px4_0/fmu/in/trajectory_setpoint
+    vehicle_command: /px4_0/fmu/in/vehicle_command
+    vehicle_status: /px4_0/fmu/out/vehicle_status
+    vehicle_local_position: /px4_0/fmu/out/vehicle_local_position
+    vehicle_odometry: /px4_0/fmu/out/vehicle_odometry
+    vehicle_command_ack: /px4_0/fmu/out/vehicle_command_ack
+  drone_1:
+    offboard_control_mode: /px4_1/fmu/in/offboard_control_mode
+    trajectory_setpoint: /px4_1/fmu/in/trajectory_setpoint
+    vehicle_command: /px4_1/fmu/in/vehicle_command
+    vehicle_status: /px4_1/fmu/out/vehicle_status
+    vehicle_local_position: /px4_1/fmu/out/vehicle_local_position
+    vehicle_odometry: /px4_1/fmu/out/vehicle_odometry
+    vehicle_command_ack: /px4_1/fmu/out/vehicle_command_ack
+  drone_2:
+    offboard_control_mode: /px4_2/fmu/in/offboard_control_mode
+    trajectory_setpoint: /px4_2/fmu/in/trajectory_setpoint
+    vehicle_command: /px4_2/fmu/in/vehicle_command
+    vehicle_status: /px4_2/fmu/out/vehicle_status
+    vehicle_local_position: /px4_2/fmu/out/vehicle_local_position
+    vehicle_odometry: /px4_2/fmu/out/vehicle_odometry
+    vehicle_command_ack: /px4_2/fmu/out/vehicle_command_ack
+  drone_3:
+    offboard_control_mode: /px4_3/fmu/in/offboard_control_mode
+    trajectory_setpoint: /px4_3/fmu/in/trajectory_setpoint
+    vehicle_command: /px4_3/fmu/in/vehicle_command
+    vehicle_status: /px4_3/fmu/out/vehicle_status
+    vehicle_local_position: /px4_3/fmu/out/vehicle_local_position
+    vehicle_odometry: /px4_3/fmu/out/vehicle_odometry
+    vehicle_command_ack: /px4_3/fmu/out/vehicle_command_ack
+
+# ============================================================
+# Style B: global (single drone, no namespace set)
+#   Default when PX4_UXRCE_DDS_NS is not set.
+#   Only works for one drone at a time.
+# ============================================================
+style_global:
+  drone_0:
+    offboard_control_mode: /fmu/in/offboard_control_mode
+    trajectory_setpoint: /fmu/in/trajectory_setpoint
+    vehicle_command: /fmu/in/vehicle_command
+    vehicle_status: /fmu/out/vehicle_status
+    vehicle_local_position: /fmu/out/vehicle_local_position
+    vehicle_odometry: /fmu/out/vehicle_odometry
+    vehicle_command_ack: /fmu/out/vehicle_command_ack

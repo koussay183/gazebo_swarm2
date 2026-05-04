@@ -1,0 +1,27 @@
+mappo_px4_rl_node:
+  ros__parameters:
+    num_drones: 1
+    checkpoint_path: ""  # Set to absolute path of best.pt, e.g. /home/user/checkpoints/best.pt
+    control_rate: 30.0
+    control_mode: "velocity"
+    pos_scale: 25.0
+    max_xy_speed: 2.5
+    max_z_speed: 1.0
+    min_altitude: 2.0
+    max_altitude: 20.0
+    min_drone_distance: 1.5
+    default_battery: 1.0
+    use_sim_time: true
+    leader_id: 0
+    topic_namespace_prefix: "/px4_"
+    px4_topic_style: "auto"
+    gazebo_pose_source_enabled: false
+    auto_arm: false
+    auto_offboard: false
+    require_qgc_ready: true
+    geofence_x_min: -25.0
+    geofence_x_max: 25.0
+    geofence_y_min: -25.0
+    geofence_y_max: 25.0
+    geofence_z_min: 0.5
+    geofence_z_max: 20.0

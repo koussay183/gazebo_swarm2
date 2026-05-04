@@ -1,0 +1,15 @@
+# Gazebo -> ROS 2 simulation clock bridge
+# ============================================================
+# Bridges /clock from Gazebo Harmonic to ROS 2.
+# Required when use_sim_time: true in ROS 2 nodes so that
+# node timers and timestamps are synchronised with the
+# Gazebo simulation clock.
+#
+# This must be running before any ROS 2 node with use_sim_time=True.
+# ============================================================
+
+- ros_topic_name: /clock
+  gz_topic_name: /clock
+  ros_type_name: rosgraph_msgs/msg/Clock
+  gz_type_name: gz.msgs.Clock
+  direction: GZ_TO_ROS

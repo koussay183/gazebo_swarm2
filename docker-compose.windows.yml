@@ -1,0 +1,21 @@
+services:
+  swarm:
+    build: .
+    image: gazebo_swarm:latest
+    container_name: swarm_sim
+    environment:
+      # VcXsrv must be running with "Disable access control" checked
+      - DISPLAY=host.docker.internal:0.0
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - FASTDDS_DEFAULT_PROFILES_FILE=/workspace/fastdds_no_shm.xml
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+    volumes:
+      - .:/workspace
+    network_mode: bridge
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    privileged: true
+    stdin_open: true
+    tty: true
+    command: /bin/bash
