@@ -1,0 +1,7 @@
+.git
+.claude
+checkpoints/*.pt
+checkpoints/checkpoint_*
+__pycache__
+*.pyc
+*.pyo

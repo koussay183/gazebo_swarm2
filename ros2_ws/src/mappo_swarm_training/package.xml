@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>mappo_swarm_training</name>
+  <version>0.1.0</version>
+  <description>
+    MAPPO training package for the drone swarm. Training is separate from PX4/Gazebo deployment.
+    Uses a simplified rl_env (no real physics). Only the trained Actor (best.pt) is used at deployment.
+  </description>
+  <maintainer email="web@slamatravel.com">koussay183</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>mappo_swarm_core</depend>
+
+  <exec_depend>python3-torch</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-gymnasium</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

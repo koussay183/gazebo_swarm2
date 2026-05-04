@@ -1,0 +1,7 @@
+swarm:
+  num_drones: 4
+  formation: v_shape
+  patrol_radius: 20.0
+  patrol_altitude: 5.0
+  encircle_radius: 5.0
+  comm_range: 30.0

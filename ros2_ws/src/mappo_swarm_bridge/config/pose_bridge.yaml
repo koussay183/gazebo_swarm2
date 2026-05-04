@@ -1,0 +1,37 @@
+# Gazebo -> ROS 2 pose bridge for PX4 X500 model(s)
+# ============================================================
+# Model name depends on PX4 launch configuration:
+#   - Single drone:  model name is typically 'x500'
+#   - Multi-drone:   model names are 'x500_0', 'x500_1', etc.
+#
+# Adjust x500_MODEL_NAME to match your PX4 simulation setup.
+# These bridges are for VISUALISATION ONLY — they do NOT feed
+# into the PX4 control loop. PX4 controls via uXRCE-DDS only.
+#
+# Usage: ros2 run ros_gz_bridge parameter_bridge --ros-args \
+#   -p config_file:=<path>/pose_bridge.yaml
+# ============================================================
+
+- ros_topic_name: /x500_0/gz/pose
+  gz_topic_name: /model/x500_0/pose
+  ros_type_name: geometry_msgs/msg/Pose
+  gz_type_name: gz.msgs.Pose
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /x500_1/gz/pose
+  gz_topic_name: /model/x500_1/pose
+  ros_type_name: geometry_msgs/msg/Pose
+  gz_type_name: gz.msgs.Pose
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /x500_2/gz/pose
+  gz_topic_name: /model/x500_2/pose
+  ros_type_name: geometry_msgs/msg/Pose
+  gz_type_name: gz.msgs.Pose
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /x500_3/gz/pose
+  gz_topic_name: /model/x500_3/pose
+  ros_type_name: geometry_msgs/msg/Pose
+  gz_type_name: gz.msgs.Pose
+  direction: GZ_TO_ROS
